@@ -1,0 +1,10 @@
+.discuss {
+  display: inline;
+}
+
+.discuss img {
+  height: 60px;
+  width: 60px;
+  display: inline;
+  margin-bottom: 0;
+}

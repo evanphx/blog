@@ -1,0 +1,31 @@
+{{ partial "head.html" . }}
+<body class="{{ .Site.Params.themeColor }} {{if .Site.Params.layoutReverse}}layout-reverse{{end}}">
+
+{{ partial "sidebar.html" . }}
+
+<div class="content container">
+  <div class="posts">
+
+    {{ range .Data.Pages }}
+      <div class="post">
+        <h1 class="post-title">
+          <a href="{{ .Permalink }}">
+            {{ .Title }}
+          </a>
+        </h1>
+
+        <span class="post-date">{{ .Date.Format "Mon, Jan 2, 2006" }}</span>
+
+        {{ .Content }}
+
+        <div class="discuss">
+          <a href="https://twitter.com/intent/tweet?text=@evanphx%20&related=evanphx&url={{ .Permalink }}"><img src="/twitter.png"></a>
+        </div>
+      </div>
+
+    {{ end }}
+  </div>
+</div>
+
+</body>
+</html>

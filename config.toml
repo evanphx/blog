@@ -1,0 +1,8 @@
+baseurl = "http://phx.io/"
+languageCode = "en-us"
+title = "phx.io"
+theme = "phx.io"
+
+[params]
+  themeColor = "theme-base-0d"
+  description = "Thoughts on Software, Kids, and Life in LA."
