@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://phx.io/</loc>
+    <loc>http://phx.io/</loc>
     <lastmod>2016-04-17T20:25:13-07:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://phx.io/posts/microservice-dev/</loc>
+    <loc>http://phx.io/posts/microservice-dev/</loc>
     <lastmod>2016-04-17T20:25:13-07:00</lastmod>
   </url>
   

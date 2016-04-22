@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Microservices on phx.io</title>
-    <link>https://phx.io/tags/microservices/</link>
+    <link>http://phx.io/tags/microservices/</link>
     <description>Recent content in Microservices on phx.io</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 17 Apr 2016 20:25:13 -0700</lastBuildDate>
-    <atom:link href="https://phx.io/tags/microservices/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://phx.io/tags/microservices/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Microservice Development - Who Runs What Where</title>
-      <link>https://phx.io/posts/microservice-dev/</link>
+      <link>http://phx.io/posts/microservice-dev/</link>
       <pubDate>Sun, 17 Apr 2016 20:25:13 -0700</pubDate>
       
-      <guid>https://phx.io/posts/microservice-dev/</guid>
+      <guid>http://phx.io/posts/microservice-dev/</guid>
       <description>
 
 &lt;p&gt;&lt;em&gt;TLDR: The industry needs a common set of practices for how to develop microservices. This post discusses the required features those practices provide.&lt;/em&gt;&lt;/p&gt;
