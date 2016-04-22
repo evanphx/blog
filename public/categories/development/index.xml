@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Development on phx.io</title>
+    <link>http://phx.io/categories/development/</link>
+    <description>Recent content in Development on phx.io</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 17 Apr 2016 20:25:13 -0700</lastBuildDate>
+    <atom:link href="http://phx.io/categories/development/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Microservice Development - Who Runs What Where</title>
+      <link>http://phx.io/posts/microservice-dev/</link>
+      <pubDate>Sun, 17 Apr 2016 20:25:13 -0700</pubDate>
+      
+      <guid>http://phx.io/posts/microservice-dev/</guid>
+      <description>
+
+&lt;p&gt;&lt;em&gt;TLDR: The industry needs a common set of practices for how to develop microservices. This post discusses the required features those practices provide.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;Microservices!&amp;rdquo; she shouted, exclaiming what a brave, new world we were
+living in.&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;No more monoliths! Code bases so small you can fit them in the palm of your hand!&amp;rdquo;. The dream was surely alive.&lt;/p&gt;
+
+&lt;p&gt;But as quickly as the exhuberance of a new development paradym set in, the
+trouble began.&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;Now instead of running one app to develop a feature, I need to have access to 5 different, coordinating services!&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;Everyone that is doing microservices has this question. How this question is answered is as varied as there are teams. And so I posed the question on twitter:&lt;/p&gt;
+
+&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;I’d love to hear how people developing services manage their dev environment for those services. Run everything locally? Nothing locally?&lt;/p&gt;&amp;mdash; Evan Phoenix (@evanphx) &lt;a href=&#34;https://twitter.com/evanphx/status/721499732665720832&#34;&gt;April 17, 2016&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&#34;//platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+
+The responses started to roll in:
+
+&lt;blockquote class=&#34;twitter-tweet&#34; data-conversation=&#34;none&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;&lt;a href=&#34;https://twitter.com/evanphx&#34;&gt;@evanphx&lt;/a&gt; we usually run the service you&amp;#39;re coding on locally, and run service dependencies in a shared sandbox environment.&lt;/p&gt;&amp;mdash; Evan Owen (@kainosnoema) &lt;a href=&#34;https://twitter.com/kainosnoema/status/721501519523098624&#34;&gt;April 17, 2016&lt;/a&gt;&lt;/blockquote&gt;
+
+&lt;blockquote class=&#34;twitter-tweet&#34; data-conversation=&#34;none&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;&lt;a href=&#34;https://twitter.com/evanphx&#34;&gt;@evanphx&lt;/a&gt; Everything locally in separate VMs (if there are dependencies) created from provisioning scripts and mock data.&lt;/p&gt;&amp;mdash; Patrick Lenz (@patricklenz) &lt;a href=&#34;https://twitter.com/patricklenz/status/721574452677472256&#34;&gt;April 17, 2016&lt;/a&gt;&lt;/blockquote&gt;
+
+&lt;blockquote class=&#34;twitter-tweet&#34; data-conversation=&#34;none&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;&lt;a href=&#34;https://twitter.com/evanphx&#34;&gt;@evanphx&lt;/a&gt; we run everything locally.&lt;/p&gt;&amp;mdash; Mike Chlipala (@mikec) &lt;a href=&#34;https://twitter.com/mikec/status/721504251407519744&#34;&gt;April 17, 2016&lt;/a&gt;&lt;/blockquote&gt;
+
+&lt;blockquote class=&#34;twitter-tweet&#34; data-conversation=&#34;none&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;&lt;a href=&#34;https://twitter.com/evanphx&#34;&gt;@evanphx&lt;/a&gt; Run everything locally. Don’t test locally though. For testing (incl. performance) hit test services which mirror prod, not staging&lt;/p&gt;&amp;mdash; Jeremy Tregunna (@jtregunna) &lt;a href=&#34;https://twitter.com/jtregunna/status/721500756294115328&#34;&gt;April 17, 2016&lt;/a&gt;&lt;/blockquote&gt;
+
+&lt;blockquote class=&#34;twitter-tweet&#34; data-conversation=&#34;none&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;&lt;a href=&#34;https://twitter.com/evanphx&#34;&gt;@evanphx&lt;/a&gt; we run only the service under development locally. Dependencies are run in a sandbox on our PaaS (Cloud Foundry in our case)&lt;/p&gt;&amp;mdash; Bruce E. Thelen (@brucethelen) &lt;a href=&#34;https://twitter.com/brucethelen/status/721668455074672640&#34;&gt;April 17, 2016&lt;/a&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;There seem to be 2 schools represented:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Run everything locally
+
+&lt;ol&gt;
+&lt;li&gt;in VMs&lt;/li&gt;
+&lt;li&gt;in containers&lt;/li&gt;
+&lt;li&gt;as regular programs&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;Run only one service locally, the rest in a remote sandbox&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I&amp;rsquo;d imagine that the second case is a reaction to the complicated nature of managing the first. If 5 different services are required to do development, a developer can easily lose a week just trying to get everything setup. VMs and containers can certainly help, and help a lot, but they still put heavy resource constraints upon a single machine.&lt;/p&gt;
+
+&lt;p&gt;What microservice development needs as a mainstream strategy that can unify these 2 approaches so that developers can easily flow between them based on ease of use. Namely, these are the necessary features:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Ability for multiple services running locally to find each other&lt;/li&gt;
+&lt;li&gt;Ability for local services to use remote ones&lt;/li&gt;
+&lt;li&gt;Ability for local services to give out a url/address for themselves that remote services can use&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Some features that I think would make such a tool/strategy even better:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A monitor that can report on traffic flowing between services
+
+&lt;ul&gt;
+&lt;li&gt;Could even include the full data stream, ala ngrok&amp;rsquo;s HTTP monitor support&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Local log aggregation&lt;/li&gt;
+&lt;li&gt;Ability to easily rebuild and restart one service without disrupting other local services&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Let&amp;rsquo;s breakdown these features:&lt;/p&gt;
+
+&lt;h3 id=&#34;multiple-local-services:50183f3ba3951ac22d67599b7a373629&#34;&gt;Multiple Local Services&lt;/h3&gt;
+
+&lt;p&gt;The easiest way do this is static port mappings. Service A always runs on 20001, B on 20002, etc. You can get a long ways doing this, but obviously it breaks down in B is now being run remotely instead of locally. In that case, port 20002 needs to run some kind of proxy that can route traffic to B.&lt;/p&gt;
+
+&lt;p&gt;One upside of static port mappings is that it simplifies internal service discovery. Rather than needing to be coded with a specific dynamic discovery strategy (DNS, Consul, etcd, etc), a simple config file or even static configuration can be used.&lt;/p&gt;
+
+&lt;p&gt;A place where static port mappings breaks down badly is when 2 versions of a service need be used. Reverting locally changes to a service to fix an unrelated bug is a huge productivity killer. For that reason, some level of dynamic configuration is preferable. It doesn&amp;rsquo;t have to be runtime dynamic, for instance environment variable inject counts as dynamic in this context.&lt;/p&gt;
+
+&lt;h3 id=&#34;dynamic-service-configuration:50183f3ba3951ac22d67599b7a373629&#34;&gt;Dynamic Service Configuration&lt;/h3&gt;
+
+&lt;p&gt;There are 2 elements to dynamic service configuration that we should discuss.&lt;/p&gt;
+
+&lt;p&gt;First is what details about a service are advertised and how the systems knows that info. For all local services, that could be a simple config file or a trivial local database where services register themselves. When you add remote services into the mix as well, something like Consul, etcd, or even Kubernetes can be queried. The key here is that a program running on the local machine can answer based on local values as well as remote ones.&lt;/p&gt;
+
+&lt;p&gt;The second part is how service information is consumed. Simplest is environment variable injection. To find service B, simply read &lt;code&gt;SERVICE_B_ADDRESS&lt;/code&gt;. This is a tried and true solution, and gives services a high degree of flexibility with regard to how they integrate that information into their local config. But environment variables have a huge downside: they can only be set at program start. That means that all services must be known and assigned some static value before any program starts up.&lt;/p&gt;
+
+&lt;p&gt;Another common technique is to use DNS to provide service information. Consul is a great example of that, it provides SRV records for services, so that given a name it&amp;rsquo;s possible to get the host and port to connect to. To use DNS service discovery though, either the DNS server that can answer with the service records needs to be in &lt;code&gt;/etc/resolv.conf&lt;/code&gt; or the DNS server needs to queried it directly. The later option is basically bootstrapping DNS based discovery via an environment variable: &lt;code&gt;SERVICE_DNS_ADDRESS&lt;/code&gt; is injected as an environment variable, then queried to provide any further records.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;A side note on DNS:&lt;/em&gt; Because we want to allow for dynamic port allocation for added flexibility, a service will likely need to query SRV records, not just an A record, from the DNS server. Because of that &lt;code&gt;gethostbyname&lt;/code&gt; can&amp;rsquo;t be used, even if the DNS server is configured properly via &lt;code&gt;/etc/resolv.conf&lt;/code&gt;. For that reason, it&amp;rsquo;s almost always cleaner to inject the DNS server address via an environment variable rather than fiddle with &lt;code&gt;/etc/resolv.conf&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;connectivity-and-callback-urls:50183f3ba3951ac22d67599b7a373629&#34;&gt;Connectivity and Callback URLs&lt;/h3&gt;
+
+&lt;p&gt;Assuming we&amp;rsquo;ve wired up the above functionality, local services can now find other services, regardless of if they&amp;rsquo;re local or remote. Now the rubber meets the road, services need to connect and send requests to each other. If a service is remote, either there is a VPN pre-configured to allow local service to route to it, or another tool is going to be running locally and providing some kind of proxy. Getting into all of that is a post for another day, so we&amp;rsquo;ll assume that is already setup. What I do want to go over briefly is the requirement that local services can be connected back to. Some will see this requirement as unnecessary, but if you&amp;rsquo;re building asynchronous, HTTP-based services, it&amp;rsquo;s- extremely useful because it means having to run and configure fewer services locally.&lt;/p&gt;
+
+&lt;p&gt;Providing this functionality can be accomplished by integrating functionality similar to &lt;a href=&#34;https://ngrok.com&#34;&gt;ngrok&lt;/a&gt;. Services will need to have a way to find out their external address so they can give it out. That can happen by injecting the information via the same service configuration we used above. So in that way, the callback proxy is just another service that assists in bridging the local/remote gap.&lt;/p&gt;
+
+&lt;h2 id=&#34;additional-features:50183f3ba3951ac22d67599b7a373629&#34;&gt;Additional Features&lt;/h2&gt;
+
+&lt;h3 id=&#34;traffic-monitoring:50183f3ba3951ac22d67599b7a373629&#34;&gt;Traffic Monitoring&lt;/h3&gt;
+
+&lt;p&gt;In development, answering the question &amp;ldquo;what exactly did I just send or receive?&amp;rdquo; is extremely common. So common that it&amp;rsquo;s common for people to just add debugging code do print out these values before being processed. Having a tool that is capturing that data for analysis would be super valuable.&lt;/p&gt;
+
+&lt;h3 id=&#34;local-log-aggregation:50183f3ba3951ac22d67599b7a373629&#34;&gt;Local Log Aggregation&lt;/h3&gt;
+
+&lt;p&gt;If a user is running 3 services locally, seeing the logs for each of them interlaced makes it much easier to understand what is happening. What I think is also important is that this log aggregation isn&amp;rsquo;t the ONLY way to see the logs. It&amp;rsquo;s also very useful to be able to just see the logs for one service without the noise of the others.&lt;/p&gt;
+
+&lt;h3 id=&#34;service-restarts:50183f3ba3951ac22d67599b7a373629&#34;&gt;Service Restarts&lt;/h3&gt;
+
+&lt;p&gt;Programs are going to get restarted really often in development as they change. Relying on frameworks to reload code (such as in Rails) is not a solution to the problem, and so providing the user the ability to stop, rebuild, and start a service without disrupting all the other features here is critical.&lt;/p&gt;
+
+&lt;p&gt;This means:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Assigned ports must not change between restarts&lt;/li&gt;
+&lt;li&gt;Restarting all services to restart one is unacceptable&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Development is all about introduce new, iterative versions of services and thusly easy restarting is a critical function.&lt;/p&gt;
+
+&lt;h2 id=&#34;summary:50183f3ba3951ac22d67599b7a373629&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;Microservice development is still in it&amp;rsquo;s infancy. Teams are slowly figuring out solutions to their specific problems and largely hacking something together. If microservices are really going to be the future (and some would say the present), then these issues have to be solved.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
