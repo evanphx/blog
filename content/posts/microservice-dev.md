@@ -15,7 +15,7 @@ living in.
 
 "No more monoliths! Code bases so small you can fit them in the palm of your hand!". The dream was surely alive.
 
-But as quickly as the exhuberance of a new development paradym set in, the
+But as quickly as the exuberance of a new development paradigm set in, the
 trouble began.
 
 "Now instead of running one app to develop a feature, I need to have access to 5 different, coordinating services!"

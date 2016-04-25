@@ -1,0 +1,169 @@
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.15" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> Accessing Internal Services &middot; phx.io </title>
+
+  
+  <link rel="stylesheet" href="http://phx.io/css/poole.css">
+  <link rel="stylesheet" href="http://phx.io/css/syntax.css">
+  <link rel="stylesheet" href="http://phx.io/css/hyde.css">
+  <link rel="stylesheet" href="http://phx.io/css/phx.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="phx.io" />
+</head>
+
+	<body class="theme-base-0d">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="http://phx.io/"><h1>phx.io</h1></a>
+      <p class="lead">
+       Thoughts on Software, Kids, and Life in LA. 
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+        <li><a href="/posts/internal-services/"> Accessing Internal Services </a></li>
+      
+        <li><a href="/posts/microservice-dev/"> Microservice Development - Who Runs What Where </a></li>
+      
+    </ul>
+
+    <p>&copy; 2016. All rights reserved. </p>
+  </div>
+</div>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>Accessing Internal Services</h1>
+			  <span class="post-date">Sun, Apr 24, 2016</span>
+			      
+
+<p><em>TLDR: Teams need to have the ability to deploy and access internal services easily.</em></p>
+
+<p>In the days before microservices, teams lived in the &ldquo;Admin Section&rdquo; of an app. It was the dumping ground for all functionality used the team that they didn&rsquo;t want users to see.</p>
+
+<p>These days, that admin section should be a small constellation of microservices, focused entirely of functionality the developers and admins use to configure and  monitor the cluster. Additionally, it&rsquo;s not uncommon for apps to expose separate endpoints that expose stats or a simple API.</p>
+
+<p>Accessing those internal services becomes critical. Teams might be tempted to resort to HTTP only, password protected APIs exposed on their public IPs. This is a security nightmare and should be discounted as soon as possible. Those internal APIs are never given the same security considerations as the public.</p>
+
+<p>Mapping internal services to external, public ports also becomes an administrative headache. Every service needs a new port and keeping tracking of that port mapping and who is using which one (and thusly which ones need to be active) spirals out of control quickly.</p>
+
+<h3 id="providing-access:1773bf4204a73b347900c2be805e78dc">Providing Access</h3>
+
+<h4 id="vpn:1773bf4204a73b347900c2be805e78dc">VPN</h4>
+
+<p>One of the easiest ways to solve this problem is to provide a VPN connection that developers can use to obtain access the internal cluster network, so that they may access the internal services.</p>
+
+<p>If you&rsquo;re on a office network, perhaps even that office network is setup to allow routed traffic to your production network. If you already have this, great. But I actually don&rsquo;t recommend setting this up. It makes it much harder to track who has access to the internal services and it&rsquo;s possible you don&rsquo;t want everyone on that network to access them. Additionally, when developers aren&rsquo;t on that office network, they need another solution to access those resources anyway. For that reason, start and end with a good client VPN solution. Treat your office network like it&rsquo;s the wifi at a coffee shop.</p>
+
+<p>There are many VPN solutions, scaling up in depending on your needs. Everything from <a href="https://help.ubuntu.com/community/SSH_VPN">using a recent ssh&rsquo;s native interface tunnel</a> to <a href="https://openvpn.net">OpenVPN</a> and up to commercial VPN appliances.</p>
+
+<p>One solution that I stumbled upon and have been using more and more is <a href="https://www.zerotier.com">ZeroTier</a>. It&rsquo;s a peer-to-peer VPN which makes it more flexible (for instance to allow access to services provided by other clients) and the configuration is dead simple. They recently bumped up their free accounts to allow 100 devices and for $29.99 you can have unlimited devices. The client is <a href="https://github.com/zerotier/ZeroTierOne/">open source</a> so what you&rsquo;re paying for is the convenience of using their cloud controller. But with the free accounts now allowing 100 devices, it&rsquo;s easy to see that everyone but large companies could use the service free!</p>
+
+<p>ZeroTier also provides a public API to allow querying which devices are online and their connection information, making it easy to incorporate DNS and auditing systems. The client also has a local API that can be used control it. This makes it also easy to debug and script against, depending on needs.</p>
+
+<p>Basically, ZeroTier is the ultimate power user VPN.</p>
+
+<h4 id="tunneling:1773bf4204a73b347900c2be805e78dc">Tunneling</h4>
+
+<p>Another mechanism that can be used is programmatic tunneling. The best example of this is kubernetes <a href="http://kubernetes.io/docs/user-guide/kubectl/kubectl_port-forward/"><code>kubectl port-forward</code></a>. This mechanism creates a tunnel and binds a local port to access a service running within a kubernetes Pod.</p>
+
+<p>When a user needs to access a service, they simple run the right incantation of <code>kubectl port-forward</code> and then access the bound port. The traffic is tunnel over the kubernetes api service running within the cluster.</p>
+
+<p>There is a big limitation with <code>kubectl port-forward</code> though. It can&rsquo;t access services, only pods. This means that the name of the thing to bind to is unstable (because pod names are usually transient, based upon the name of the replicated controller). So to use <code>kubectl port-forward</code> with any regularity, users have to script translating from a replicated controller or service to a pod, then invoke <code>kubectl port-forward</code>. I hope that in the future, this functionality is built directly in, it would vastly improve the usefulness.</p>
+
+<h3 id="directory:1773bf4204a73b347900c2be805e78dc">Directory</h3>
+
+<p>The number of revelation behind deploying microservices is that it&rsquo;s easy to lose track of them. With dynamic scheduling and replicas, what is running where becomes a task that a computer should be tracking, not a human.</p>
+
+<p>This directory of services becomes important when developers want to use these internal services. Hunting around for random IP address / port combos is a great way to loose a day and then accidentally use the wrong service all together.</p>
+
+<p>This directory concept directly fits in with my <a href="/posts/microservice-dev/">previous post about bridging the gap between local and remote services</a>. In this case though what is needed is basically an internal portal, listing the services and provide links to the internal HTTP ones. This concept is already done by larger engineering organizations but rarely makes it way down. Every team doing microservices, whether it&rsquo;s a one person operation or Google itself, needs this functionality.</p>
+
+<h3 id="case-study:1773bf4204a73b347900c2be805e78dc">Case Study: Kubernetes + ZeroTier</h3>
+
+<p>I want to detail the setup that I currently use which is working fantastically, not only for developer access, but also to bridge services between clusters.</p>
+
+<p><em>The names of the services/clusters have been changed to protect the innocent</em></p>
+
+<h4 id="the-players:1773bf4204a73b347900c2be805e78dc">The players</h4>
+
+<ul>
+<li>Cluster W, running:
+
+<ul>
+<li>Reader</li>
+<li>Purge</li>
+</ul></li>
+<li>Cluster M, running:
+
+<ul>
+<li>Members</li>
+</ul></li>
+<li>Developer machine Z</li>
+</ul>
+
+<p>Both clusters are running kubernetes and there are associated replicated controllers and services for each of the above apps.</p>
+
+<h5 id="installation:1773bf4204a73b347900c2be805e78dc">Installation</h5>
+
+<ol>
+<li>We need a ZeroTier network. Login and create one, giving it whatever name.</li>
+<li>Install the ZeroTier clients on the master instances of W and M, but not the minions.</li>
+<li>Add the master instances ZeroTier clients to your previously created network.</li>
+<li>Configure the master instances to run <code>kube-proxy</code>. This means that the masters are now aware of all services in the cluster and can route traffic to the minions based on those services.</li>
+<li>Install ZeroTier on Z and add it to the ZeroTier network.</li>
+<li>At this point, you should have connectivity from Z to both W and M. The ZeroTier UI will show you the IP address that they&rsquo;ve been assigned and you should be able to ping between them.
+
+<ul>
+<li>If you can&rsquo;t then it&rsquo;s likely that there are firewalls blocking traffic getting to W and M.</li>
+<li>Alter the firewall (for instance, in AWS, change the security group) to allow UDP port 9993.</li>
+<li>You should now have connectivity.</li>
+</ul></li>
+<li>Z can now access any service provided by clusters W and M that use <a href="http://kubernetes.io/docs/user-guide/services/#type-nodeport">NodePort</a>.</li>
+</ol>
+
+<p>Because ZeroTier provides a Point-to-Point VPN, the Readers service now has access to Members on M. But because the traffic has to flow through the master, you need to add an IP route so that traffic for the ip subnet used by ZeroTier is sent to the master. On AWS, this is done by adding a route to your VPC.</p>
+
+<h5 id="directory-1:1773bf4204a73b347900c2be805e78dc">Directory</h5>
+
+<p>To do basic dynamic configuration, the ZeroTier API is queried for devices and their assigned name is added to a special <code>int.blah.com</code> domain. That allows for device to easily access the other nodes by name rather than auto-assigned IP.</p>
+
+<p>For the apps running inside the Kubernetes cluster, those are assigned ports and tracked by Kubernetes itself. There is a simple script that can resolve the node port assigned to a service from it&rsquo;s name. Because these ports are stable, they can be put into configuration files safely.</p>
+
+<h5 id="day-to-day:1773bf4204a73b347900c2be805e78dc">Day to day</h5>
+
+<p>From Z, it&rsquo;s possible to access the Members service simply by doing <code>curl w.int.blah.com:$(resolve m members)</code>, where <code>resolve</code> is a simple script that translates the cluster name and service into a port number.</p>
+
+<p>Reader can use the same addressing mechanism to access Members as well.</p>
+
+<h3 id="summary:1773bf4204a73b347900c2be805e78dc">Summary</h3>
+
+<p>Internal services are backbone of a microservices architecture. They provide the most important functionality and accessing them is critical. Provide secure and consistent access to removes stumbling blocks, keeping everything moving.</p>
+
+
+        <div class="discuss">
+          <a href="https://twitter.com/intent/tweet?text=@evanphx%20&related=evanphx&url=http%3a%2f%2fphx.io%2fposts%2finternal-services%2f"><img src="/twitter.png"></a>
+        </div>
+			</div>
+		</div>
+
+  </body>
+</html>
